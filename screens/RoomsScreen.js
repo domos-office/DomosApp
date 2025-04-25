@@ -1,83 +1,66 @@
+// RoomsScreen.js
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  ImageBackground,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 
-export default function RoomsScreen({ route }) {
+export default function RoomsScreen() {
   const navigation = useNavigation();
-  const { home } = route.params; // Home name passed from HomeScreen
+  const route = useRoute();
+  const homeName = route.params?.home || 'Home';
+
+  const rooms = ['Living Room', 'Kitchen', 'Bedroom', 'Bathroom'];
+
+  const [fontsLoaded] = useFonts({
+    Dongle: require('../assets/fonts/Dongle-Regular.ttf'),
+    'Dongle-Bold': require('../assets/fonts/Dongle-Bold.ttf'),
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#131946' }}>
-      <ImageBackground
-        source={require('../assets/gradient.jpg')}
-        style={{ flex: 1, padding: 20 }}
-        resizeMode="cover"
-      >
-        <Text
-          style={{
-            fontSize: 36,
-            color: 'white',
-            fontFamily: 'Dongle-Bold',
-            marginBottom: 20,
-          }}
+    <ScrollView style={{ backgroundColor: '#131946', flex: 1 }}>
+      <Text style={styles.header}>{homeName}</Text>
+      <Text style={styles.subHeader}>Select a Room</Text>
+      {rooms.map((room, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.roomCard}
+          onPress={() => navigation.navigate('Devices', { room })}
         >
-          Rooms in {home}
-        </Text>
-
-        <ScrollView>
-          {['Living Room', 'Bedroom', 'Kitchen'].map((room, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.card}
-              onPress={() => navigation.navigate('Devices', { room: room })}  // Pass room name to Devices
-            >
-              <ImageBackground
-                source={require('../assets/card-placeholder.png')}
-                style={styles.imageBackground}
-                imageStyle={{ borderRadius: 15 }}
-              >
-                <View style={styles.overlay} />
-                <Text style={styles.cardText}>{room}</Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </ImageBackground>
-    </SafeAreaView>
+          <Text style={styles.roomText}>{room}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 }
 
-const styles = {
-  card: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
-    borderRadius: 15,
-    overflow: 'hidden',
+const styles = StyleSheet.create({
+  header: {
+    color: 'white',
+    fontSize: 48,
+    textAlign: 'center',
+    fontFamily: 'Dongle-Bold',
+    marginTop: 40,
   },
-  imageBackground: {
-    flex: 1,
-    justifyContent: 'center',
+  subHeader: {
+    color: 'white',
+    fontSize: 32,
+    textAlign: 'center',
+    fontFamily: 'Dongle',
+    marginBottom: 20,
+  },
+  roomCard: {
+    backgroundColor: '#1E215A',
+    marginHorizontal: 40,
+    marginVertical: 10,
+    paddingVertical: 20,
+    borderRadius: 15,
     alignItems: 'center',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(93, 86, 243, 0.4)',
-    borderRadius: 15,
-  },
-  cardText: {
+  roomText: {
+    fontSize: 28,
     color: 'white',
-    fontSize: 20,
     fontFamily: 'Dongle-Bold',
-    textAlign: 'center',
-    zIndex: 1,
   },
-};
+});
